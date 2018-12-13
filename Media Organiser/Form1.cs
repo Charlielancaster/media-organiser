@@ -14,13 +14,13 @@ namespace Media_Organiser
 {
     public partial class Form1 : Form
     {
-        protected string resume = "Start";
-        private string playlists = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + @"\Playlists\";
-        Funcs funcs = new Funcs();
-        DataFuncs datafuncs = new DataFuncs();
-        protected List<Category> Categories = new List<Category>();
+        static private string playlists = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + @"\Playlists\";
+        static private string categories = playlists + @"Categories\";
+        static Funcs funcs = new Funcs();
+        static DataFuncs datafuncs = new DataFuncs();
         protected Playlist spl = new Playlist();
         protected Playlist selectedPL = new Playlist();
+        protected List<Category> allcategories = new List<Category>();
         protected List<Whizzyfile> listinscope = new List<Whizzyfile>();
         protected List<Playlist> allplaylists = new List<Playlist>();
         protected bool isSessionPL = true;
@@ -29,39 +29,18 @@ namespace Media_Organiser
     public Form1()
         {
             InitializeComponent();
-            loadPlaylists();
+            allplaylists = funcs.loadPlaylists(_playlistListView, allplaylists);
+            allcategories = datafuncs.loadCategories();
         }
 
         /* minor form functions */
-
-        protected void loadPlaylists()
-        {
-            _playlistListView.Items.Clear();
-            allplaylists.Clear();
-            if (Directory.Exists(playlists))
-            {
-                DirectoryInfo d = new DirectoryInfo(playlists);
-                foreach (FileInfo f in d.GetFiles())
-                {
-                    allplaylists.Add(datafuncs.loadPlaylist(f.FullName));
-                }
-            }
-            else
-            {
-                Directory.CreateDirectory(playlists);
-            }
-            foreach (Playlist p in allplaylists)
-            {
-                _playlistListView.Items.Add(p.playlistname).SubItems.Add(p.playlistID.ToString());
-            };
-        }
-
-        /* Button functionality */
 
         protected void clearlistview()
         {
             _fileListView.Items.Clear();
         }
+
+        /* Button functionality */
 
         private void _fileListView_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -151,12 +130,7 @@ namespace Media_Organiser
                 if (spl.whizzyfilelist.Count != 0) { spl.whizzyfilelist.Clear(); };
             }
             isSessionPL = false;
-            loadPlaylists();
-        }
-
-        private void _loadPlaylist_Click(object sender, EventArgs e)
-        {
-            isSessionPL = false;
+            funcs.loadPlaylists(_playlistListView, allplaylists);
         }
 
         private void _cMediaButton_Click(object sender, EventArgs e)
@@ -273,6 +247,59 @@ namespace Media_Organiser
             {
                 MessageBox.Show("Please select a playlist to delete",
                     "Delete playlist");
+            }
+        }
+
+        private void _addCat_Click(object sender, EventArgs e)
+        {
+            using (DialogBox dialogbox = new DialogBox())
+            {
+                if (dialogbox.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    if (dialogbox.textboxdata != null || dialogbox.textboxdata != "" || dialogbox.textboxdata != " ")
+                    {
+                        bool catexist = false;
+                        foreach (Category c in allcategories)
+                        {
+                            if (c.catname == dialogbox.textboxdata)
+                            {
+                                catexist = true;
+                                break;
+                            }
+                        }
+                        if (!catexist)
+                        {
+                            allcategories.Add(datafuncs.createCategory(dialogbox.textboxdata));
+                            datafuncs.updateCategories(allcategories);
+                            DirectoryInfo d = new DirectoryInfo(categories);
+                            FileInfo f = new FileInfo(d.FullName + "Categories.json");
+                            if (File.Exists(f.FullName))
+                            {
+                                allcategories.AddRange(datafuncs.loadCategories());
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("That category already exists");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please enter a category name");
+                    }
+                }
+            }
+            datafuncs.loadCategories();
+        }
+
+        private void _editCategories_Click(object sender, EventArgs e)
+        {
+            using (CategoryViewer editcatbox = new CategoryViewer())
+            {
+                if (editcatbox.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
             }
         }
     }

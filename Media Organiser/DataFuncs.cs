@@ -11,8 +11,8 @@ namespace Media_Organiser
 {
     public class DataFuncs
     {
-        //private string datastore = @"../../Data/Playlists/";
-        private string datastore = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + @"\Playlists\";
+        public static string datastore = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + @"\Playlists\";
+        public static string datastore2 = datastore + @"Categories\";
 
         public bool saveFile(Playlist playlist, string playlistname)
         {
@@ -33,6 +33,24 @@ namespace Media_Organiser
             }
         }
 
+        public Category createCategory(string categoryname)
+        {
+            Category cat = new Category();
+            cat.catname = categoryname;
+
+            return cat;
+        }
+
+        public void updateCategories(List<Category> categories)
+        {
+            using (StreamWriter saveFile = File.CreateText(datastore2 + "Categories.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                //serialize object directly into file stream
+                serializer.Serialize(saveFile, categories);
+            }
+        }
+
         public void createPlaylist(Playlist playlist, string playlistname)
         {
             if (playlist.playlistname == null || playlist.playlistcount == 0 || playlist.whizzyfilelist == null)
@@ -46,6 +64,37 @@ namespace Media_Organiser
                 //serialize object directly into file stream
                 serializer.Serialize(saveFile, playlist);
             }
+        }
+
+        public List<Category> loadCategories()
+        {
+            List<Category> item = new List<Category>();
+            if (Directory.Exists(datastore2))
+            {
+                DirectoryInfo d = new DirectoryInfo(datastore2);
+                FileInfo f = new FileInfo(d.FullName + "Categories.json");
+                if (File.Exists(f.FullName))
+                {
+                    using (StreamReader r = new StreamReader(f.FullName))
+                    {
+                        string json = r.ReadToEnd();
+                        item = JsonConvert.DeserializeObject<List<Category>>(json);
+                    }
+                }
+                else
+                {
+                    Category cat = new Category();
+                    cat.catname = "Jazz";
+                    item.Add(cat);
+                    updateCategories(item);
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(datastore2);
+            }
+
+            return item;
         }
 
         public Playlist loadPlaylist(string fn)

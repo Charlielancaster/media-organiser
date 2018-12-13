@@ -37,6 +37,7 @@
             this._fileType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._fileComment = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._fileCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this._fileImage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._createPlaylist = new System.Windows.Forms.Button();
             this._saveToPlaylist = new System.Windows.Forms.Button();
             this._deletePlaylist = new System.Windows.Forms.Button();
@@ -46,9 +47,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this._playlistName = new System.Windows.Forms.Label();
             this._addCat = new System.Windows.Forms.Button();
-            this._editCat = new System.Windows.Forms.Button();
-            this._delCat = new System.Windows.Forms.Button();
-            this._fileImage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this._editCategories = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -112,6 +111,11 @@
             // 
             this._fileCategory.Text = "Categories";
             this._fileCategory.Width = 109;
+            // 
+            // _fileImage
+            // 
+            this._fileImage.Text = "Image";
+            this._fileImage.Width = 112;
             // 
             // _createPlaylist
             // 
@@ -200,29 +204,17 @@
             this._addCat.TabIndex = 19;
             this._addCat.Text = "Add Category";
             this._addCat.UseVisualStyleBackColor = true;
+            this._addCat.Click += new System.EventHandler(this._addCat_Click);
             // 
-            // _editCat
+            // _editCategories
             // 
-            this._editCat.Location = new System.Drawing.Point(736, 538);
-            this._editCat.Name = "_editCat";
-            this._editCat.Size = new System.Drawing.Size(138, 23);
-            this._editCat.TabIndex = 20;
-            this._editCat.Text = "Edit Category";
-            this._editCat.UseVisualStyleBackColor = true;
-            // 
-            // _delCat
-            // 
-            this._delCat.Location = new System.Drawing.Point(736, 567);
-            this._delCat.Name = "_delCat";
-            this._delCat.Size = new System.Drawing.Size(138, 23);
-            this._delCat.TabIndex = 21;
-            this._delCat.Text = "Delete Category";
-            this._delCat.UseVisualStyleBackColor = true;
-            // 
-            // _fileImage
-            // 
-            this._fileImage.Text = "Image";
-            this._fileImage.Width = 112;
+            this._editCategories.Location = new System.Drawing.Point(736, 538);
+            this._editCategories.Name = "_editCategories";
+            this._editCategories.Size = new System.Drawing.Size(138, 24);
+            this._editCategories.TabIndex = 20;
+            this._editCategories.Text = "Edit Categories";
+            this._editCategories.UseVisualStyleBackColor = true;
+            this._editCategories.Click += new System.EventHandler(this._editCategories_Click);
             // 
             // Form1
             // 
@@ -230,8 +222,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1219, 636);
-            this.Controls.Add(this._delCat);
-            this.Controls.Add(this._editCat);
+            this.Controls.Add(this._editCategories);
             this.Controls.Add(this._addCat);
             this.Controls.Add(this._playlistName);
             this.Controls.Add(this.pictureBox1);
@@ -270,9 +261,8 @@
         private System.Windows.Forms.ColumnHeader playlistName;
         private System.Windows.Forms.ColumnHeader playlistID;
         private System.Windows.Forms.Button _addCat;
-        private System.Windows.Forms.Button _editCat;
-        private System.Windows.Forms.Button _delCat;
         private System.Windows.Forms.ColumnHeader _fileImage;
+        private System.Windows.Forms.Button _editCategories;
     }
 }
 

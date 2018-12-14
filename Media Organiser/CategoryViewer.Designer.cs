@@ -28,21 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this._editCat = new System.Windows.Forms.Button();
+            this._selectCat = new System.Windows.Forms.Button();
             this._delCat = new System.Windows.Forms.Button();
             this._categoryList = new System.Windows.Forms.ListView();
             this._category = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this._catID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
-            // _editCat
+            // _selectCat
             // 
-            this._editCat.Location = new System.Drawing.Point(12, 415);
-            this._editCat.Name = "_editCat";
-            this._editCat.Size = new System.Drawing.Size(138, 23);
-            this._editCat.TabIndex = 21;
-            this._editCat.Text = "Edit Category";
-            this._editCat.UseVisualStyleBackColor = true;
+            this._selectCat.DialogResult = System.Windows.Forms.DialogResult.Yes;
+            this._selectCat.Location = new System.Drawing.Point(12, 415);
+            this._selectCat.Name = "_selectCat";
+            this._selectCat.Size = new System.Drawing.Size(138, 23);
+            this._selectCat.TabIndex = 21;
+            this._selectCat.Text = "Select Category";
+            this._selectCat.UseVisualStyleBackColor = true;
+            this._selectCat.Click += new System.EventHandler(this._selectCat_Click);
             // 
             // _delCat
             // 
@@ -85,21 +87,21 @@
             this.ClientSize = new System.Drawing.Size(384, 450);
             this.Controls.Add(this._categoryList);
             this.Controls.Add(this._delCat);
-            this.Controls.Add(this._editCat);
+            this.Controls.Add(this._selectCat);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "CategoryViewer";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "CategoryViewr";
+            this.Text = "CategoryViewer";
             this.TopMost = true;
             this.ResumeLayout(false);
 
         }
 
         #endregion
-        private System.Windows.Forms.Button _editCat;
+        private System.Windows.Forms.Button _selectCat;
         private System.Windows.Forms.Button _delCat;
         private System.Windows.Forms.ListView _categoryList;
         private System.Windows.Forms.ColumnHeader _category;

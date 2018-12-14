@@ -16,6 +16,8 @@ namespace Media_Organiser
         static DataFuncs datafuncs = new DataFuncs();
         static Funcs funcs = new Funcs();
         protected List<Category> allcategories = new List<Category>();
+        public List<Category> retlist = new List<Category>();
+        public bool editingcats = true;
 
         public CategoryViewer()
         {
@@ -59,6 +61,26 @@ namespace Media_Organiser
                 {
                     string[] row = { c.catID.ToString() };
                     _categoryList.Items.Add(c.catname).SubItems.AddRange(row);
+                }
+            }
+        }
+
+        public void _selectCat_Click(object sender, EventArgs e)
+        {
+            _categoryList.MultiSelect = editingcats == false ? true : false;
+            if (editingcats)
+            {
+                MessageBox.Show("Click on a Category to edit them");
+            }
+            else
+            {
+                retlist.Clear();
+                if (_categoryList.SelectedItems.Count != 0)
+                {
+                    for (int i = 0; i < _categoryList.SelectedItems.Count; i++)
+                    {
+                        retlist.Add(allcategories.Find(item => item.catID.ToString() == _categoryList.SelectedItems[i].SubItems[1].Text));
+                    }
                 }
             }
         }

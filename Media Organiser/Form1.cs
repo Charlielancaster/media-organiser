@@ -26,7 +26,7 @@ namespace Media_Organiser
         protected bool isSessionPL = true;
 
 
-    public Form1()
+        public Form1()
         {
             InitializeComponent();
             allplaylists = funcs.loadPlaylists(_playlistListView, allplaylists);
@@ -60,8 +60,10 @@ namespace Media_Organiser
         {
             using (DialogBox dialogbox = new DialogBox())
             {
+                dialogbox.textboxdata = "";
                 if (dialogbox.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
+                    spl.playlistname = dialogbox.textboxdata;
                     datafuncs.createPlaylist(spl, dialogbox.textboxdata);
                 }
             }
@@ -113,15 +115,17 @@ namespace Media_Organiser
                     funcs.addListToExistingPlaylist(selectedPL, listinscope);
                 }
 
-            datafuncs.saveFile(selectedPL, _playlistListView.SelectedItems[0].Text);
+                datafuncs.saveFile(selectedPL, _playlistListView.SelectedItems[0].Text);
+                allplaylists.Add(selectedPL);
             }
             else
             {
                 using (DialogBox dialogbox = new DialogBox())
                 {
+                    dialogbox.textboxdata = "";
                     if (dialogbox.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        spl.playlistname = dialogbox.Text;
+                        spl.playlistname = dialogbox.textboxdata;
                         datafuncs.createPlaylist(spl, dialogbox.textboxdata);
                         _playlistName.Text = spl.playlistname;
                     }
@@ -170,24 +174,24 @@ namespace Media_Organiser
 
                         listinscope.Add(whizzyfile);
                     }
-            }
+                }
 
                 foreach (Whizzyfile file in listinscope)
                 {
-                        if (_fileListView.Items.Count == 0)
+                    if (_fileListView.Items.Count == 0)
+                    {
+                        string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment, file.imagepath };
+                        _fileListView.Items.Add(file.Filename).SubItems.AddRange(row);
+                    }
+                    else
+                    {
+                        if (!_fileListView.Items.ToString().Contains(file.Filename))
                         {
-                            string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment };
+                            string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment, file.imagepath };
                             _fileListView.Items.Add(file.Filename).SubItems.AddRange(row);
                         }
-                        else
-                        {
-                            if (!_fileListView.Items.ToString().Contains(file.Filename))
-                            {
-                                string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment };
-                                _fileListView.Items.Add(file.Filename).SubItems.AddRange(row);
-                            }
-                        }
                     }
+                }
 
                 if (isSessionPL)
                 {
@@ -212,16 +216,9 @@ namespace Media_Organiser
             if (_playlistListView.SelectedItems.Count != 0)
             {
                 Playlist mPlaylist = allplaylists.Find(item => item.playlistname == _playlistListView.SelectedItems[0].Text);
-                if (mPlaylist != null && mPlaylist.whizzyfilelist != null)
-                {
-                    foreach (Whizzyfile wfl in mPlaylist.whizzyfilelist)
-                    {
-                        string[] row = { wfl.Filepath, wfl.Filetype, wfl.Filecomment };
-                        _fileListView.Items.Add(wfl.Filename).SubItems.AddRange(row);
-                    }
-                }
+                funcs.populateListView(_fileListView, mPlaylist);
                 _playlistName.Text = _playlistListView.SelectedItems[0].Text;
-                selectedPL.playlistname = _playlistName.Text;
+                selectedPL = mPlaylist;
                 isSessionPL = false;
             }
             listinscope.Clear();
@@ -300,6 +297,159 @@ namespace Media_Organiser
                 {
 
                 }
+            }
+        }
+
+        private void _commentEdit_Click(object sender, EventArgs e)
+        {
+            if (_fileListView.SelectedItems.Count != 0)
+            {
+                Whizzyfile sfile = selectedPL.whizzyfilelist.Find(item => item.Filepath == _fileListView.SelectedItems[0].SubItems[1].Text);
+                using (DialogBox dialogbox = new DialogBox())
+                {
+                    dialogbox.boxTitle = "Edit Comment";
+                    dialogbox.labelText = "Add or edit your comment here";
+                    if (sfile.Filecomment != null)
+                    {
+                        dialogbox.textboxdata = null;
+                        dialogbox.textboxdata = sfile.Filecomment;
+                    }
+                    if (dialogbox.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        if (!isSessionPL)
+                        {
+                            sfile.Filecomment = dialogbox.textboxdata;
+                            datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                            _fileListView.Items.Clear();
+                            funcs.populateListView(_fileListView, selectedPL);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a file edit",
+                    "Select file");
+            }
+        }
+
+        private void _assignCategories_Click(object sender, EventArgs e)
+        {
+            if (_fileListView.SelectedItems.Count != 0)
+            {
+                using (CategoryViewer editcatbox = new CategoryViewer())
+                {
+                    editcatbox.editingcats = false;
+                    if (editcatbox.ShowDialog() == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        Whizzyfile sfile = selectedPL.whizzyfilelist.Find(item => item.Filepath == _fileListView.SelectedItems[0].SubItems[1].Text);
+                        foreach (Category g in sfile.FileGenres)
+                        {
+                            if (sfile.FileGenres.Any(item => item.catname == g.catname))
+                            {
+                                Category dfile = new Category();
+                                dfile = sfile.FileGenres.Find(item => item.catname == g.catname);
+                                editcatbox.retlist.Remove(dfile);
+                            }
+                        }
+                        sfile.FileGenres.AddRange(editcatbox.retlist);
+                    }
+                }
+                funcs.populateListView(_fileListView, selectedPL);
+            }
+            else
+            {
+                MessageBox.Show("Please select a file to assign Categories to");
+            }
+        }
+
+        private void _assignImage_Click(object sender, EventArgs e)
+        {
+            if (_fileListView.SelectedItems.Count != 0)
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Title = "Please select image to add.";
+                openFileDialog.Filter = "Media files |*.jpg; *.jpeg; *.png; *.svg; *.bmp;";
+
+                if (_fileListView.SelectedItems.Count == 1)
+                {
+                    Whizzyfile sfile = selectedPL.whizzyfilelist.Find(item => item.Filepath == _fileListView.SelectedItems[0].SubItems[1].Text);
+
+                    if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+
+                        int numFiles = openFileDialog.FileNames.Length;
+
+                        for (int i = 0; i < numFiles; i++)
+                        {
+                            sfile.imagepath = openFileDialog.FileName;
+                        }
+
+                        datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                        _fileListView.Items.Clear();
+                        funcs.populateListView(_fileListView, selectedPL);
+                    }
+                } else
+                {
+                    List<Whizzyfile> selectlist = new List<Whizzyfile>();
+                    foreach (Whizzyfile f in selectedPL)
+                    {
+                        for (int i = 0; i < _fileListView.SelectedItems.Count; i++)
+                        {
+                            if (f.Filepath == _fileListView.SelectedItems[i].SubItems[1].Text)
+                            {
+                                f.imagepath = openFileDialog.FileName;
+                            }
+                        }
+                    }
+                    datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                    _fileListView.Items.Clear();
+                    funcs.populateListView(_fileListView, selectedPL);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a file edit",
+                    "Select file");
+            }
+        }
+
+        private void _removeImg_Click(object sender, EventArgs e)
+        {
+            if (_fileListView.SelectedItems.Count != 0)
+            {
+
+                if (_fileListView.SelectedItems.Count == 1)
+                {
+                    Whizzyfile sfile = selectedPL.whizzyfilelist.Find(item => item.Filepath == _fileListView.SelectedItems[0].SubItems[1].Text);
+
+                    sfile.imagepath = "";
+                    datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                    _fileListView.Items.Clear();
+                    funcs.populateListView(_fileListView, selectedPL);
+                }
+                else
+                {
+                    List<Whizzyfile> selectlist = new List<Whizzyfile>();
+                    foreach (Whizzyfile f in selectedPL)
+                    {
+                        for (int i = 0; i < _fileListView.SelectedItems.Count; i++)
+                        {
+                            if (f.Filepath == _fileListView.SelectedItems[i].SubItems[1].Text)
+                            {
+                                f.imagepath = "";
+                            }
+                        }
+                    }
+                    datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                    _fileListView.Items.Clear();
+                    funcs.populateListView(_fileListView, selectedPL);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a file edit",
+                    "Select file");
             }
         }
     }

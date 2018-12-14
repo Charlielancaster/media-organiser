@@ -14,8 +14,8 @@ namespace Media_Organiser
         public string Filepath { get; set; }
         public string Filetype { get; set; }
         public string Filecomment { get; set; }
-        //public string[] FileGenres { get; set; }
-        //public string imagepath { get; set; }
+        public List<Category> FileGenres = new List<Category>();
+        public string imagepath { get; set; }
 
         public IEnumerator GetEnumerator()
         {

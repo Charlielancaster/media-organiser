@@ -47,5 +47,29 @@ namespace Media_Organiser
 
             return retlist;
         }
+
+        public void populateListView (ListView listview, Playlist playlist)
+        {
+            listview.Items.Clear();
+            if (playlist != null && playlist.whizzyfilelist != null)
+            {
+                foreach (Whizzyfile wfl in playlist.whizzyfilelist)
+                {
+                    string listcategories = "";
+                    if (wfl.Filecomment == null) { wfl.Filecomment = " "; }
+                    if (wfl.FileGenres != null)
+                    {
+                        int count = 1;
+                        foreach (Category c in wfl.FileGenres)
+                        {
+                            listcategories += count < wfl.FileGenres.Count ? c.catname + ", " : c.catname;
+                            count++;
+                        }
+                    }
+                    string[] row = { wfl.Filepath, wfl.Filetype, wfl.Filecomment, wfl.imagepath, listcategories };
+                    listview.Items.Add(wfl.Filename).SubItems.AddRange(row);
+                }
+            }
+        }
     }
 }

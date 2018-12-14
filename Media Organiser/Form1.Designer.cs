@@ -48,6 +48,10 @@
             this._playlistName = new System.Windows.Forms.Label();
             this._addCat = new System.Windows.Forms.Button();
             this._editCategories = new System.Windows.Forms.Button();
+            this._commentEdit = new System.Windows.Forms.Button();
+            this._assignCategories = new System.Windows.Forms.Button();
+            this._assignImage = new System.Windows.Forms.Button();
+            this._removeImg = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -216,12 +220,56 @@
             this._editCategories.UseVisualStyleBackColor = true;
             this._editCategories.Click += new System.EventHandler(this._editCategories_Click);
             // 
+            // _commentEdit
+            // 
+            this._commentEdit.Location = new System.Drawing.Point(880, 509);
+            this._commentEdit.Name = "_commentEdit";
+            this._commentEdit.Size = new System.Drawing.Size(138, 23);
+            this._commentEdit.TabIndex = 21;
+            this._commentEdit.Text = "Edit Comment";
+            this._commentEdit.UseVisualStyleBackColor = true;
+            this._commentEdit.Click += new System.EventHandler(this._commentEdit_Click);
+            // 
+            // _assignCategories
+            // 
+            this._assignCategories.Location = new System.Drawing.Point(880, 538);
+            this._assignCategories.Name = "_assignCategories";
+            this._assignCategories.Size = new System.Drawing.Size(138, 23);
+            this._assignCategories.TabIndex = 22;
+            this._assignCategories.Text = "Assign Categories";
+            this._assignCategories.UseVisualStyleBackColor = true;
+            this._assignCategories.Click += new System.EventHandler(this._assignCategories_Click);
+            // 
+            // _assignImage
+            // 
+            this._assignImage.Location = new System.Drawing.Point(880, 567);
+            this._assignImage.Name = "_assignImage";
+            this._assignImage.Size = new System.Drawing.Size(138, 23);
+            this._assignImage.TabIndex = 23;
+            this._assignImage.Text = "Assign Image";
+            this._assignImage.UseVisualStyleBackColor = true;
+            this._assignImage.Click += new System.EventHandler(this._assignImage_Click);
+            // 
+            // _removeImg
+            // 
+            this._removeImg.Location = new System.Drawing.Point(880, 597);
+            this._removeImg.Name = "_removeImg";
+            this._removeImg.Size = new System.Drawing.Size(138, 23);
+            this._removeImg.TabIndex = 24;
+            this._removeImg.Text = "Remove Image";
+            this._removeImg.UseVisualStyleBackColor = true;
+            this._removeImg.Click += new System.EventHandler(this._removeImg_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1219, 636);
+            this.Controls.Add(this._removeImg);
+            this.Controls.Add(this._assignImage);
+            this.Controls.Add(this._assignCategories);
+            this.Controls.Add(this._commentEdit);
             this.Controls.Add(this._editCategories);
             this.Controls.Add(this._addCat);
             this.Controls.Add(this._playlistName);
@@ -263,6 +311,10 @@
         private System.Windows.Forms.Button _addCat;
         private System.Windows.Forms.ColumnHeader _fileImage;
         private System.Windows.Forms.Button _editCategories;
+        private System.Windows.Forms.Button _commentEdit;
+        private System.Windows.Forms.Button _assignCategories;
+        private System.Windows.Forms.Button _assignImage;
+        private System.Windows.Forms.Button _removeImg;
     }
 }
 

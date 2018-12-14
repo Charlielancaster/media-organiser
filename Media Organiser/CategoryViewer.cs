@@ -47,24 +47,6 @@ namespace Media_Organiser
             datafuncs.updateCategories(allcategories);
         }
 
-        private void _delCat_Click(object sender, EventArgs e)
-        {
-            if (_categoryList.SelectedItems.Count != 0)
-            {
-                Category mcategory = new Category();
-                mcategory = allcategories.Find(item => item.catID.ToString() == _categoryList.SelectedItems[0].SubItems[1].Text);
-                allcategories.Remove(mcategory);
-                datafuncs.updateCategories(allcategories);
-                allcategories = datafuncs.loadCategories();
-                _categoryList.Items.Clear();
-                foreach (Category c in allcategories)
-                {
-                    string[] row = { c.catID.ToString() };
-                    _categoryList.Items.Add(c.catname).SubItems.AddRange(row);
-                }
-            }
-        }
-
         public void _selectCat_Click(object sender, EventArgs e)
         {
             _categoryList.MultiSelect = editingcats == false ? true : false;
@@ -81,6 +63,24 @@ namespace Media_Organiser
                     {
                         retlist.Add(allcategories.Find(item => item.catID.ToString() == _categoryList.SelectedItems[i].SubItems[1].Text));
                     }
+                }
+            }
+        }
+
+        private void _delCat_Click(object sender, EventArgs e)
+        {
+            if (_categoryList.SelectedItems.Count != 0)
+            {
+                Category mcategory = new Category();
+                mcategory = allcategories.Find(item => item.catID.ToString() == _categoryList.SelectedItems[0].SubItems[1].Text);
+                allcategories.Remove(mcategory);
+                datafuncs.updateCategories(allcategories);
+                allcategories = datafuncs.loadCategories();
+                _categoryList.Items.Clear();
+                foreach (Category c in allcategories)
+                {
+                    string[] row = { c.catID.ToString() };
+                    _categoryList.Items.Add(c.catname).SubItems.AddRange(row);
                 }
             }
         }

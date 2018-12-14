@@ -66,7 +66,7 @@ namespace Media_Organiser
                             count++;
                         }
                     }
-                    string[] row = { wfl.Filepath, wfl.Filetype, wfl.Filecomment, wfl.imagepath, listcategories };
+                    string[] row = { wfl.Filepath, wfl.Filetype, wfl.Filecomment, listcategories, wfl.imagepath };
                     listview.Items.Add(wfl.Filename).SubItems.AddRange(row);
                 }
             }

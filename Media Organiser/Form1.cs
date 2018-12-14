@@ -42,6 +42,20 @@ namespace Media_Organiser
 
         /* Button functionality */
 
+        private void _playlistListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            _fileListView.Items.Clear();
+            if (_playlistListView.SelectedItems.Count != 0)
+            {
+                Playlist mPlaylist = allplaylists.Find(item => item.playlistname == _playlistListView.SelectedItems[0].Text);
+                funcs.populateListView(_fileListView, mPlaylist);
+                _playlistName.Text = _playlistListView.SelectedItems[0].Text;
+                selectedPL = mPlaylist;
+                isSessionPL = false;
+            }
+            listinscope.Clear();
+        }
+
         private void _fileListView_SelectedIndexChanged(object sender, EventArgs e)
         {
             Playlist playlist = !isSessionPL ? selectedPL : spl;
@@ -101,12 +115,15 @@ namespace Media_Organiser
                 {
                     foreach (Whizzyfile item in selectedPL.whizzyfilelist)
                     {
-                        int count = 0;
-                        if (item.Filepath == listinscope[count].Filepath)
+                        if (listinscope.Count != 0)
                         {
-                            listinscope.RemoveAt(count);
+                            int count = 0;
+                            if (item.Filepath == listinscope[count].Filepath)
+                            {
+                                listinscope.RemoveAt(count);
+                            }
+                            count++;
                         }
-                        count++;
                     }
                     funcs.addListToExistingPlaylist(selectedPL, listinscope);
                 }
@@ -115,7 +132,7 @@ namespace Media_Organiser
                     funcs.addListToExistingPlaylist(selectedPL, listinscope);
                 }
 
-                datafuncs.saveFile(selectedPL, _playlistListView.SelectedItems[0].Text);
+                datafuncs.savePlaylist(selectedPL, _playlistListView.SelectedItems[0].Text);
                 allplaylists.Add(selectedPL);
             }
             else
@@ -135,6 +152,29 @@ namespace Media_Organiser
             }
             isSessionPL = false;
             funcs.loadPlaylists(_playlistListView, allplaylists);
+        }
+
+        private void _deletePlaylist_Click(object sender, EventArgs e)
+        {
+            if (_playlistListView.SelectedItems.Count != 0)
+            {
+                DialogResult dialog = MessageBox.Show("Are you sure you wish to delete this playlist?",
+                    "Delete playlist?",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (dialog == DialogResult.Yes)
+                {
+                    File.Delete(playlists + _playlistListView.SelectedItems[0].SubItems[0].Text + ".json");
+                    _playlistListView.SelectedItems[0].Remove();
+                    if (_fileListView.Items != null) { _fileListView.Items.Clear(); }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a playlist to delete",
+                    "Delete playlist");
+            }
         }
 
         private void _cMediaButton_Click(object sender, EventArgs e)
@@ -178,16 +218,27 @@ namespace Media_Organiser
 
                 foreach (Whizzyfile file in listinscope)
                 {
+                    string listcategories = "";
+                    if (file.Filecomment == null) { file.Filecomment = " "; }
+                    if (file.FileGenres != null)
+                    {
+                        int count = 1;
+                        foreach (Category c in file.FileGenres)
+                        {
+                            listcategories += count < file.FileGenres.Count ? c.catname + ", " : c.catname;
+                            count++;
+                        }
+                    }
                     if (_fileListView.Items.Count == 0)
                     {
-                        string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment, file.imagepath };
+                        string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment, listcategories, file.imagepath };
                         _fileListView.Items.Add(file.Filename).SubItems.AddRange(row);
                     }
                     else
                     {
                         if (!_fileListView.Items.ToString().Contains(file.Filename))
                         {
-                            string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment, file.imagepath };
+                            string[] row = { file.Filepath, Path.GetExtension(file.Filepath), file.Filecomment, listcategories, file.imagepath };
                             _fileListView.Items.Add(file.Filename).SubItems.AddRange(row);
                         }
                     }
@@ -207,43 +258,10 @@ namespace Media_Organiser
                         spl = funcs.addListToExistingPlaylist(spl, listinscope);
                     }
                 }
-            }
-        }
-
-        private void _playlistListView_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            _fileListView.Items.Clear();
-            if (_playlistListView.SelectedItems.Count != 0)
-            {
-                Playlist mPlaylist = allplaylists.Find(item => item.playlistname == _playlistListView.SelectedItems[0].Text);
-                funcs.populateListView(_fileListView, mPlaylist);
-                _playlistName.Text = _playlistListView.SelectedItems[0].Text;
-                selectedPL = mPlaylist;
-                isSessionPL = false;
-            }
-            listinscope.Clear();
-        }
-
-        private void _deletePlaylist_Click(object sender, EventArgs e)
-        {
-            if (_playlistListView.SelectedItems.Count != 0)
-            {
-                DialogResult dialog = MessageBox.Show("Are you sure you wish to delete this playlist?",
-                    "Delete playlist?",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-
-                if (dialog == DialogResult.Yes)
+                else
                 {
-                    File.Delete(playlists + _playlistListView.SelectedItems[0].SubItems[0].Text + ".json");
-                    _playlistListView.SelectedItems[0].Remove();
-                    if (_fileListView.Items != null) { _fileListView.Items.Clear(); }
+                    selectedPL = funcs.addListToExistingPlaylist(selectedPL, listinscope);
                 }
-            }
-            else
-            {
-                MessageBox.Show("Please select a playlist to delete",
-                    "Delete playlist");
             }
         }
 
@@ -319,7 +337,7 @@ namespace Media_Organiser
                         if (!isSessionPL)
                         {
                             sfile.Filecomment = dialogbox.textboxdata;
-                            datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                            datafuncs.savePlaylist(selectedPL, selectedPL.playlistname);
                             _fileListView.Items.Clear();
                             funcs.populateListView(_fileListView, selectedPL);
                         }
@@ -385,7 +403,7 @@ namespace Media_Organiser
                             sfile.imagepath = openFileDialog.FileName;
                         }
 
-                        datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                        datafuncs.savePlaylist(selectedPL, selectedPL.playlistname);
                         _fileListView.Items.Clear();
                         funcs.populateListView(_fileListView, selectedPL);
                     }
@@ -402,7 +420,7 @@ namespace Media_Organiser
                             }
                         }
                     }
-                    datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                    datafuncs.savePlaylist(selectedPL, selectedPL.playlistname);
                     _fileListView.Items.Clear();
                     funcs.populateListView(_fileListView, selectedPL);
                 }
@@ -424,7 +442,7 @@ namespace Media_Organiser
                     Whizzyfile sfile = selectedPL.whizzyfilelist.Find(item => item.Filepath == _fileListView.SelectedItems[0].SubItems[1].Text);
 
                     sfile.imagepath = "";
-                    datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                    datafuncs.savePlaylist(selectedPL, selectedPL.playlistname);
                     _fileListView.Items.Clear();
                     funcs.populateListView(_fileListView, selectedPL);
                 }
@@ -441,7 +459,7 @@ namespace Media_Organiser
                             }
                         }
                     }
-                    datafuncs.saveFile(selectedPL, selectedPL.playlistname);
+                    datafuncs.savePlaylist(selectedPL, selectedPL.playlistname);
                     _fileListView.Items.Clear();
                     funcs.populateListView(_fileListView, selectedPL);
                 }

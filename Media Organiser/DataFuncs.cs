@@ -14,22 +14,18 @@ namespace Media_Organiser
         public static string datastore = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) + @"\Playlists\";
         public static string datastore2 = datastore + @"Categories\";
 
-        public bool saveFile(Playlist playlist, string playlistname)
+        public void createPlaylist(Playlist playlist, string playlistname)
         {
+            if (playlist.playlistname == null || playlist.playlistcount == 0 || playlist.whizzyfilelist == null)
+            {
+                playlist.playlistname = playlistname;
+                playlist.playlistcount = playlist.whizzyfilelist != null ? playlist.whizzyfilelist.Count : 0;
+            }
             using (StreamWriter saveFile = File.CreateText(datastore + playlistname + ".json"))
             {
-                try
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    //serialize object directly into file stream
-                    serializer.Serialize(saveFile, playlist);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                    return false;
-                }
+                JsonSerializer serializer = new JsonSerializer();
+                //serialize object directly into file stream
+                serializer.Serialize(saveFile, playlist);
             }
         }
 
@@ -39,31 +35,6 @@ namespace Media_Organiser
             cat.catname = categoryname;
 
             return cat;
-        }
-
-        public void updateCategories(List<Category> categories)
-        {
-            using (StreamWriter saveFile = File.CreateText(datastore2 + "Categories.json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                //serialize object directly into file stream
-                serializer.Serialize(saveFile, categories);
-            }
-        }
-
-        public void createPlaylist(Playlist playlist, string playlistname)
-        {
-            if (playlist.playlistname == null || playlist.playlistcount == 0 || playlist.whizzyfilelist == null)
-            {
-                playlist.playlistname = playlistname;
-                playlist.playlistcount = playlist.whizzyfilelist != null ? playlist.whizzyfilelist.Count : 0;         
-            }
-            using (StreamWriter saveFile = File.CreateText(datastore + playlistname + ".json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                //serialize object directly into file stream
-                serializer.Serialize(saveFile, playlist);
-            }
         }
 
         public List<Category> loadCategories()
@@ -100,13 +71,42 @@ namespace Media_Organiser
         public Playlist loadPlaylist(string fn)
         {
             Playlist item = new Playlist();
-                    using (StreamReader r = new StreamReader(fn))
-                    {
-                        string json = r.ReadToEnd();
-                        item = JsonConvert.DeserializeObject<Playlist>(json);
-                    }
+            using (StreamReader r = new StreamReader(fn))
+            {
+                string json = r.ReadToEnd();
+                item = JsonConvert.DeserializeObject<Playlist>(json);
+            }
 
             return item;
+        }
+
+        public bool savePlaylist(Playlist playlist, string playlistname)
+        {
+            using (StreamWriter saveFile = File.CreateText(datastore + playlistname + ".json"))
+            {
+                try
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    //serialize object directly into file stream
+                    serializer.Serialize(saveFile, playlist);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return false;
+                }
+            }
+        }
+
+        public void updateCategories(List<Category> categories)
+        {
+            using (StreamWriter saveFile = File.CreateText(datastore2 + "Categories.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                //serialize object directly into file stream
+                serializer.Serialize(saveFile, categories);
+            }
         }
 
         public bool checkExists(string playlistName)
